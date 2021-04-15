@@ -13,6 +13,7 @@ Fylm: FILM: https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&exp
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <syslog.h>
 #include <string.h>
 #include <time.h>
 #include <wait.h>
@@ -22,7 +23,7 @@ void download(char *link, char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[6] = {
+        char *argv[7] = {
             "wget",
             "--no-check-certificate",
             "-q",
@@ -43,7 +44,7 @@ void unzip(char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[3] = {
+        char *argv[4] = {
             "unzip",
             "-q",
             name
@@ -61,7 +62,7 @@ void copy(char *name, char *target) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[4] = {
+        char *argv[5] = {
             "cp",
             "-R",
             name,
@@ -80,7 +81,7 @@ void zip() {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[7] = {
+        char *argv[8] = {
             "zip", 
             "-q",
             "-r", 
@@ -102,7 +103,7 @@ void delete() {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[8] = {
+        char *argv[9] = {
             "rm",
             "-rf",
             "FOTO",
@@ -123,6 +124,7 @@ void delete() {
 
 int main() {
     pid_t pid, sid;
+
 	pid = fork();
 
 	if (pid < 0) {
@@ -144,9 +146,9 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-    // close(STDIN_FILENO);
-	// close(STDOUT_FILENO);
-	// close(STDERR_FILENO);
+    close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
     char *link[3] = {
         "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download",
