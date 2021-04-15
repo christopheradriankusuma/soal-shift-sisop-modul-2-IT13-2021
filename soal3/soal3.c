@@ -14,6 +14,30 @@
 int x_signal = 0;
 char *mode;
 
+void killer(){
+    FILE *target;
+    target = fopen("killer.sh", "w");
+    int status;
+
+    fprintf(target, "pkill -10 soal3\nrm killer.sh");
+
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[4] = {
+            "chmod",
+            "+x",
+            "killer.sh"
+        };
+        
+        execv("/bin/chmod", argv);
+    } else if (pid > 0) {
+        wait(NULL);
+        fclose(target);
+    }
+}
+
 char* encrypt(char *text, int shift) {
     int len = strlen(text);
     char *res, new;
@@ -41,7 +65,7 @@ void download(char *link, char *name) {
     pid = fork();
 
     if (pid == 0) {
-        char *argv[6] = {
+        char *argv[7] = {
             "wget",
             "--no-check-certificate",
             "-q",
@@ -120,7 +144,7 @@ void delete_dir(char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[3] = {
+        char *argv[4] = {
             "rm",
             "-rf",
             target
@@ -135,7 +159,6 @@ void delete_dir(char *name) {
 
 void sigterm_handler(int signal) {
     if (strcmp(mode, "-z") == 0) {
-        printf("mode -z\n");
         exit(EXIT_SUCCESS);
     } else if (strcmp(mode, "-x") == 0) {
         x_signal = 1;
@@ -146,8 +169,15 @@ int main(int argc, char *argv[]) {
     signal(10, sigterm_handler);
     mode = argv[1];
 
+    killer();
+
+    if (argc != 2) {
+        printf("Required argument! -x / -z\n");
+        exit(EXIT_FAILURE);
+    }
+
     if (strcmp(mode, "-z") != 0 && strcmp(mode, "-x") != 0) {
-        printf("Unknown argument %s\n", argv[1]);
+        printf("Unknown argument %s. available -x / -z\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 
@@ -219,7 +249,6 @@ int main(int argc, char *argv[]) {
         if (argc > 1) {
             if (strcmp(argv[1], "-x") == 0) {
                 if (x_signal == 1) {
-                    printf("mode -x\n");
                     exit(EXIT_SUCCESS);
                     break;
                 }
