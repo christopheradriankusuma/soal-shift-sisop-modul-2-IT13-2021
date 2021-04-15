@@ -13,7 +13,7 @@ void unzip(char *name, char *target) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[4] = {
+        char *argv[5] = {
             "unzip",
             name,
             "-d",
@@ -35,7 +35,7 @@ void deleteFiles(char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[3] = {
+        char *argv[4] = {
             "rm",
             "-rf",
             target
@@ -86,7 +86,7 @@ void copyFile(char *dir, char *init_name, char *pet_name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[3] = {
+        char *argv[4] = {
             "cp",
             source,
             target
