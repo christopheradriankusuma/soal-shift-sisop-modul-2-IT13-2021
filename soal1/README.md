@@ -1,11 +1,5 @@
 # Soal  Shift Modul 2 Sistem Operasi 2021
 
-### <b> Nama Anggota Kelompok:
-#### 1. Asiyah Hanifah (05311940000002)
-#### 2. Muhammad Yasykur Rafii (05311940000017)
-#### 3. Christopher Adrian Kusuma (05311940000022)
----
-
 ## Soal 1
 
 Pada suatu masa, hiduplah seorang Steven yang hidupnya pas-pasan. Steven punya pacar, namun sudah putus sebelum pacaran. Ketika dia galau memikirkan mantan, ia selalu menonton https://www.youtube.com/watch?v=568DH_9CMKI untuk menghilangkan kesedihannya.</br>
