@@ -124,7 +124,6 @@ void delete() {
 
 int main() {
     pid_t pid, sid;
-
 	pid = fork();
 
 	if (pid < 0) {
