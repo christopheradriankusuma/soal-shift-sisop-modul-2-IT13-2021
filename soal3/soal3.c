@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-    // close(STDIN_FILENO);
-	// close(STDOUT_FILENO);
-	// close(STDERR_FILENO);
+    close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
     char *link = "https://picsum.photos/";
     
