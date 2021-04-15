@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "unistd.h": "c",
-        "syslog.h": "c",
-        "wait.h": "c",
-        "time.h": "c",
-        "string.h": "c"
-    }
-}
