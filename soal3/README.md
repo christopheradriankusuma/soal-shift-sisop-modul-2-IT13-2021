@@ -16,7 +16,8 @@ Ranora adalah mahasiswa Teknik Informatika yang saat ini sedang menjalani magang
 
 Ranora meminta bantuanmu untuk membantunya dalam membuat program tersebut. Karena kamu anak baik dan rajin menabung, bantulah Ranora dalam membuat program tersebut!
 
-### <b>Note:
+### <b>Note: </b>
+
 - Tidak boleh menggunakan system() dan mkdir()
 - Program utama merupakan SEBUAH PROGRAM C
 - Wajib memuat algoritma Caesar Cipher pada program utama yang dibuat
