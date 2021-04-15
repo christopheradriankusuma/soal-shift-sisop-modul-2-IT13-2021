@@ -19,7 +19,7 @@ Pada hari ulang tahun Stevany, Steven ingin memberikan Stevany zip berisikan hal
 (e) Untuk memudahkan Steven, ia ingin semua hal di atas berjalan otomatis 6 jam sebelum waktu ulang tahun Stevany). (f) Setelah itu pada waktu ulang tahunnya Stevany, semua folder akan di zip dengan nama Lopyu_Stevany.zip dan semua folder akan di delete(sehingga hanya menyisakan .zip).
 Kemudian Steven meminta bantuanmu yang memang sudah jago sisop untuk membantunya mendapatkan hati Stevany. Bantu Woy!!
 
-### <b>Note:
+### <b>Note:</b>
 - Ulang Tahun Stevany : 09 April Pukul 22.22 WIB
 - Semua poin dijalankan oleh 1 script di latar belakang, termasuk mendownload file zip-nya. Jadi cukup jalankan script 1x serta ubah time dan date untuk check hasilnya.
 
@@ -34,7 +34,9 @@ https://drive.google.com/drive/folders/1NzRiPPoVlR_H8P51cxN4jaceeFQGk4un
 Musik: https://drive.google.com/file/d/1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J/view </br>
 Film: https://drive.google.com/file/d/1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp/view </br>
 
-### <b>Tips:
+### <b>Tips: </b>
+
+
 - Gunakan fungsi wait() dan sleep() untuk memperlancarrr..
 - untuk mendownload zip yang dibutuhkan bisa menggunakan command :
 > Pwget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
