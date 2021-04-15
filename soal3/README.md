@@ -18,8 +18,8 @@ Ranora meminta bantuanmu untuk membantunya dalam membuat program tersebut. Karen
 
 ### <b>Note:
 - Tidak boleh menggunakan system() dan mkdir()
-- <b>Program utama </b> merupakan <b>SEBUAH PROGRAM C</b>
-- <b>Wajib</b> memuat algoritma Caesar Cipher pada program utama yang dibuat
+- Program utama merupakan SEBUAH PROGRAM C
+- Wajib memuat algoritma Caesar Cipher pada program utama yang dibuat
 
 
 ## Penyelesaian:
