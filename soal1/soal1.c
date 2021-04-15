@@ -13,7 +13,6 @@ Fylm: FILM: https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&exp
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include <syslog.h>
 #include <string.h>
 #include <time.h>
 #include <wait.h>
