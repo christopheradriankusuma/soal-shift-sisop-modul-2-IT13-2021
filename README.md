@@ -261,13 +261,106 @@ int main() {
 }
 ```
 ### Penjelasan Code:
+1. Membuat fungsi untuk mendownload file melalui link yang ditentukan sebagai berikut. Dimana di sini kami menggunakan wget dalam childenya untuk mengunduh file tersebut. Kemudian parentnya dibuat wait untuk menunggu beberapa saat agar child proses berjalan dulu.
+```C
+void download(char *link, char *name) {
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[6] = {
+            "wget", //menggunakan wget untuk mengunduh file berbanyak
+            "--no-check-certificate", 
+            "-q",
+            link, //menuju ke link yang akan didownload
+            "-O",
+            name
+        };
+        
+        execv("/bin/wget", argv); //mengeksekusi dengan mendowloadnya
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL); 
+    }
+}
+```
+2. Membuat fungsi untuk mengekstrak semua file yang sudah di download sebagai berikut. Di dalam fungsi ini kami menggunakan unzip untuk mengekstrak file yang sudah didownload. Parent pada fungsi ini kami buat menunggu sementara seperti fungsi sebelumnya agar child menjalankan prosesnya terlebih dahulu.
+```C
+void unzip(char *name) {
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[3] = {
+            "unzip", 
+            "-q",
+            name
+        };
+
+        execv("/usr/bin/unzip", argv);
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL); 
+    }
+}
+```
+3. Membuat fungsi copy untuk memindahkan file yang sudah diekstrak. Dengan cara mengcopy file Contohnya: dari folder Musik ke Musyik.
+```C
+void copy(char *name, char *target) {
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[4] = { 
+            "cp", //mengcopy 
+            "-R",
+            name,
+            target
+        };
+
+        execv("/bin/cp", argv);
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL);
+    }
+}
+```
+
+4. Membuat fungsi zip untuk menjadikan semua folder tersebut dalam bentuk zip dan merenamenya dengan format nama Lopyou_Stevany.zip.
+```C
+void zip() {
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[7] = {
+            "zip", 
+            "-q",
+            "-r", 
+            "Lopyou_Stevany.zip",
+            "Pyoto", 
+            "Musyik", 
+            "Fylm"
+        };
+
+        execv("/bin/zip", argv);
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL);
+    }
+}
+```
 
 ## Kendala yang Dihadapi: 
-ini kendala
+tidak ada.
 
 ## Screeshoot Hasil:
 
-<img src= "./Pictures/ss soal1.png">
+1. Mendownload file yang diinginkan kemudian meng-extract-nya setelah didownload. Setelah itu memindahkannya ke dalam folder yang telah dibuat kemudian menjadikannya dalam bentuk zip kemudian merename masing2 folder tersebut dengan nama (film/foto/musik)_for_Stevany
+![gambar11](soal1.png)
+
+2. Kemudian semua folder di zip dengan nama Lopyu_Stevany.zip dan semua folder akan di delete(sehingga hanya menyisakan .zip)
+![gambar21](soal1a.png)
 
 
 ---
@@ -338,14 +431,502 @@ Ranora meminta bantuanmu untuk membantunya dalam membuat program tersebut. Karen
 
 ## Penyelesaian:
 ### Code:
+```C
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <syslog.h>
+#include <string.h>
+#include <time.h>
+#include <signal.h>
+#include <wait.h>
+
+int x_signal = 0;
+char *mode;
+
+void killer(){
+    FILE *target;
+    target = fopen("killer.sh", "w");
+    int status;
+
+    fprintf(target, "pkill -10 soal3\nrm killer.sh");
+
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[4] = {
+            "chmod",
+            "+x",
+            "killer.sh"
+        };
+        
+        execv("/bin/chmod", argv);
+    } else if (pid > 0) {
+        wait(NULL);
+        fclose(target);
+    }
+}
+
+char* encrypt(char *text, int shift) {
+    int len = strlen(text);
+    char *res, new;
+    res = (char*)malloc(sizeof(char) * (len + 1));
+
+    for (int i = 0; i < len; ++i) {
+        char now = *(text + i);
+        if ('a' <= now && now <= 'z') {
+            new = ((*(text + i) - 'a' + shift) % 26) + 'a';
+        } else if ('A' <= now && now <= 'Z') {
+            new = ((*(text + i) - 'A' + shift) % 26) + 'A';
+        } else if ('0' <= now && now <= '0') {
+            new = ((*(text + i) - '0' + shift) % 10) + '0';
+        } else {
+            new = *(text + i);
+        }
+        *(res + i) = new;
+    }
+
+    return res;
+}
+
+void download(char *link, char *name) {
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[7] = {
+            "wget",
+            "--no-check-certificate",
+            "-q",
+            link,
+            "-O",
+            name
+        };
+        
+        execv("/bin/wget", argv);
+        exit(EXIT_SUCCESS);
+    } else if (pid > 0) {
+        wait(NULL);
+    }
+}
+
+char *get_time() {
+    time_t now = time(NULL);
+    struct tm *ptm = localtime(&now);
+
+    char *formatted_time;
+    formatted_time = (char *)malloc(20 * sizeof(char));
+    sprintf(formatted_time, "%04d-%02d-%02d_%02d:%02d:%02d", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+
+    return formatted_time;
+}
+
+void create_dir(char *name) {
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[3] = {
+            "mkdir",
+            name
+        };
+
+        if(execv("/bin/mkdir", argv) == -1) {
+            printf("mkdir %s\n", name);
+        }
+        exit(EXIT_SUCCESS);
+    } else if (pid > 0) {
+        wait(NULL);
+    }
+}
+
+void zip(char *name) {
+    char zip_name[25];
+    sprintf(zip_name, "%s.zip", name);
+
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[6] = {
+            "zip",
+            "-q",
+            "-r",
+            zip_name,
+            name
+        };
+
+        if(execv("/bin/zip", argv) == -1) {
+            printf("zip -q -r %s %s\n", zip_name, name);
+        }
+        exit(EXIT_SUCCESS);
+    } else if (pid > 0) {
+        wait(NULL);
+    }
+}
+
+void delete_dir(char *name) {
+    char target[25];
+    sprintf(target, "%s/", name);
+
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[4] = {
+            "rm",
+            "-rf",
+            target
+        };
+
+        execv("/bin/rm", argv);
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL);
+    }
+}
+
+void sigterm_handler(int signal) {
+    if (strcmp(mode, "-z") == 0) {
+        exit(EXIT_SUCCESS);
+    } else if (strcmp(mode, "-x") == 0) {
+        x_signal = 1;
+    }
+}
+
+int main(int argc, char *argv[]) {
+    signal(10, sigterm_handler);
+    mode = argv[1];
+
+    killer();
+
+    if (argc != 2) {
+        printf("Required argument! -x / -z\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp(mode, "-z") != 0 && strcmp(mode, "-x") != 0) {
+        printf("Unknown argument %s. available -x / -z\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
+
+    pid_t pid, sid;
+
+	pid = fork();
+
+	if (pid < 0) {
+		exit(EXIT_FAILURE);
+	}
+
+	if (pid > 0) {
+		exit(EXIT_SUCCESS);
+	}
+
+	umask(0);
+
+	sid = setsid();
+	if (sid < 0) {
+		exit(EXIT_FAILURE);
+	}
+
+	if ((chdir("/home/kali/modul2")) < 0) {
+		exit(EXIT_FAILURE);
+	}
+
+    close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+
+    // link yang akan dituju untuk didownload fotonya
+    char *link = "https://picsum.photos/";
+    
+    
+    char *dir;
+    dir = (char *)malloc(20 * sizeof(char));
+
+    
+    char *name;
+    name = (char *)malloc(42 * sizeof(char));
+
+
+    while (1) {
+        dir = get_time();
+        create_dir(dir);
+
+        chdir(dir);
+
+        for (int i = 0; i < 10; ++i) {
+            name = get_time();
+
+            time_t t = time(NULL);
+
+            
+            char *pic;
+            pic = (char *)malloc(30 * sizeof(char));
+            sprintf(pic, "%s%d", link, (t%1000)+50);
+            download(pic, name);
+            
+            sleep(5);
+        }
+
+        char *enc = encrypt("Download Success", 5);
+
+        FILE *fptr;
+        fptr = fopen("status.txt", "w");
+        fprintf(fptr, "%s", enc);
+        fclose(fptr);
+
+        chdir("..");
+        zip(dir);
+        delete_dir(dir);
+
+        if (argc > 1) {
+            if (strcmp(argv[1], "-x") == 0) {
+                if (x_signal == 1) {
+                    exit(EXIT_SUCCESS);
+                    break;
+                }
+            }
+        }
+
+        sleep(40);
+    }
+
+    return 0;
+}
+```
 
 ### Penjelasan
+1. Membuat fungsi untuk membuat required argument dimana jika user memanjalankan program file dengan metode z maka metode ini mendownload semua file dan kemudian menjadikan file yang ada di folder tersebut dalam bentuk zip kemudian jika dihentikan programnya maka akan langsung berhenti sedangkan metode -x jika dihentikan programnya maka akan menjalankan dulu hingga selesai programnya kemudian akan berhenti.
+```C
+void sigterm_handler(int signal) {
+    if (strcmp(mode, "-z") == 0) {
+        exit(EXIT_SUCCESS);
+    } else if (strcmp(mode, "-x") == 0) {
+        x_signal = 1;
+    }
+}
+```
+2. Membuat folder baru yang di dalamnya berisi foto yang sudah di download melalui link yang disediakan selain itu file foto tersebut diberi nama sesuai yang waktu downloadnya. Kemudian di sleep(5) agar dimana setiap gambar akan didownload setiap 5 detik
+```C
+sid = setsid();
+	if (sid < 0) {
+		exit(EXIT_FAILURE);
+	}
 
+	if ((chdir("/home/kali/modul2")) < 0) {
+		exit(EXIT_FAILURE);
+	}
+
+    close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
+
+    // link yang akan dituju untuk didownload fotonya
+    char *link = "https://picsum.photos/";
+    
+    
+    char *dir;
+    dir = (char *)malloc(20 * sizeof(char));
+
+    
+    char *name;
+    name = (char *)malloc(42 * sizeof(char));
+
+
+    while (1) {
+        //membuat folder dan mengambil waktu pembuatan foldernya
+        dir = get_time();
+        create_dir(dir);
+
+        //merename foldernya dengan format yang ditentukan
+        chdir(dir);
+
+        for (int i = 0; i < 10; ++i) {
+            name = get_time();
+
+            time_t t = time(NULL);
+
+            
+            char *pic;
+            pic = (char *)malloc(30 * sizeof(char));
+            //ukuran foto dibuat persegi dengan (n%1000) + 50 pixel dimana n adalah detik Epoch Unix.
+            sprintf(pic, "%s%d", link, (t%1000)+50);
+
+            //mendownload fotonya kemudian untuk namanya disesuaikan dengan format waktu saat mendownloadnya.
+            download(pic, name);
+
+            //durasi mendowload tiap gambar
+            sleep(5);
+        }
+```
+3. Setelah mendownload 10 gambar maka dibuat program yang nantinya membuat file 'status.txt' dimana berisi pesan "Download Success" namun pesan ini terenkripsi dengan teknik Caesar Cipher dan shift 5. Kemudian folder tersebut akan di zip dan folder tersebut didelete, sehingga menyisakan hanya file zip saja.
+``` C
+char *enc = encrypt("Download Success", 5);
+
+        FILE *fptr;
+        //membuat file status.txt
+        fptr = fopen("status.txt", "w");
+
+        //isi pesan dari status.txt tadi dienkripsi dengan teknik caesar cipher dan shift 5.
+        fprintf(fptr, "%s", enc);
+        fclose(fptr);
+
+        chdir("..");
+
+        // folder ini akan dijadikan satu zip
+        zip(dir);
+
+        // kemudian folder tadi dihapus
+        delete_dir(dir);
+
+        if (argc > 1) {
+            if (strcmp(argv[1], "-x") == 0) {
+                if (x_signal == 1) {
+                    exit(EXIT_SUCCESS);
+                    break;
+                }
+            }
+        }
+        // Membutuhkan 40 detik untuk membuat folder atau direktori berikutnya.
+        sleep(40);
+```
+4. Berikut adalah penjelasan lebih lengkap mengenai fungsi-fungsi yang dijalankan
+
+a. Fungsi Enkripsi. Fungsi ini melakukan enkripsi string sesuai dengan shift/key yang nanti ditentukan. Contohnya: misal pesannya a maka setelah dishift 5 akan menjadi f
+```C
+char* encrypt(char *text, int shift) {
+    int len = strlen(text);
+    char *res, new;
+    res = (char*)malloc(sizeof(char) * (len + 1));
+
+    for (int i = 0; i < len; ++i) {
+        char now = *(text + i);
+        if ('a' <= now && now <= 'z') {
+            // melakukan shift sesuai yang ditentukan pada huruf abjad kecil
+            new = ((*(text + i) - 'a' + shift) % 26) + 'a';
+            // melakukan shift sesuai yang ditentukan pada huruf kapital
+        } else if ('A' <= now && now <= 'Z') {
+            new = ((*(text + i) - 'A' + shift) % 26) + 'A';
+            //// melakukan shift sesuai yang ditentukan pada angka 
+        } else if ('0' <= now && now <= '0') {
+            new = ((*(text + i) - '0' + shift) % 10) + '0';
+        } else {
+            new = *(text + i);
+        }
+        *(res + i) = new;
+    }
+
+    return res;
+}
+```
+b. Fungsi download untuk mendownload filenya.
+```C
+void download(char *link, char *name) {
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[7] = {
+            "wget", //menggunakan wget untuk mengunduh file berbanyak
+            "--no-check-certificate",
+            "-q",
+            link,
+            "-O",
+            name
+        };
+        
+        execv("/bin/wget", argv);
+        exit(EXIT_SUCCESS);
+    } else if (pid > 0) {
+        wait(NULL);
+    }
+}
+```
+c. Fungsi get time untuk mendapatkan format waktu yang nantinya akan dibuat untuk memberi nama folder yang sesuai dengan format waktu downloadnya.
+``` C
+char *get_time() {
+    
+    time_t now = time(NULL);
+    //membuat pointer waktu yang bertipe tm struct yang berisi waktu kalender dengan komponen2 yg sudah ada
+    struct tm *ptm = localtime(&now);
+
+    //melakukan pemformartan waktu sesuai yang dibutuhkan
+    char *formatted_time;
+    formatted_time = (char *)malloc(20 * sizeof(char));
+    sprintf(formatted_time, "%04d-%02d-%02d_%02d:%02d:%02d", ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+
+    return formatted_time;
+}
+```
+d. fungsi zip untuk menjadikan folder yang berisi gambar tersebut dibuat dalam bentuk zip
+```C
+void zip(char *name) {
+    char zip_name[25];
+    sprintf(zip_name, "%s.zip", name);
+
+    pid_t pid;
+    pid = fork();
+
+    if (pid == 0) {
+        char *argv[6] = {
+            "zip",
+            "-q",
+            "-r",
+            zip_name,
+            name
+        };
+
+        if(execv("/bin/zip", argv) == -1) {
+            printf("zip -q -r %s %s\n", zip_name, name);
+        }
+        exit(EXIT_SUCCESS);
+    } else if (pid > 0) {
+        wait(NULL);
+    }
+}
+```
+e. Fungsi delete folder/direktori
+```C
+void delete_dir(char *name) {
+    char target[25];
+    sprintf(target, "%s/", name);
+
+    pid_t child_id;
+    child_id = fork();
+
+    if (child_id == 0) {
+        char *argv[4] = {
+            "rm", // menggunakan rm untuk menghapus direktori dan filenya.
+            "-rf",
+            target
+        };
+
+        execv("/bin/rm", argv);
+        exit(EXIT_SUCCESS);
+    } else if (child_id > 0) {
+        wait(NULL);
+    }
+}
+```
 ## Kendala yang Dihadapi: 
-ini kendala
+Saat mendownload gambar durasinya tidak tepat 5 detik namun bisa sampai 6-7 detik.
 
 ## Screeshoot Hasil:
+1. Metode -z dimana metode ini mendownload semua file dan kemudian menjadikan file yang ada di folder tersebut dalam bentuk zip.
+![gambar](soal3z1.png)
+Ketika killer.sh nya dijalankan dia akan langsung berhenti.
+![gambar](soal3z.png)
 
+2. Metode -x dimana metode ini mendownload semua file dan kemudian menjadikan file yang ada di folder tersebut dalam bentuk zip.
+![gambar](soalx1.png)
+Namun ketika killer.sh dijalankan program akan menunggu dahulu hingga proses selesai kemudian berhenti
+![gambar](soal3x2.png)
 
 
 ---
