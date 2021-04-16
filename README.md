@@ -267,6 +267,7 @@ ini kendala
 
 ## Screeshoot Hasil:
 
+<img src= "./Pictures/ss soal1.png">
 
 
 ---
