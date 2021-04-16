@@ -891,7 +891,7 @@ void zip(char *name) {
     }
 }
 ```
-e. Fungsi delete folder/direktori
+e. Fungsi delete folder/direktori untuk menghapus direktori beserta filenya setelah file dizip
 ```C
 void delete_dir(char *name) {
     char target[25];
