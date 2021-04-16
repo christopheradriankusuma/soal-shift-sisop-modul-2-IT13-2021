@@ -17,34 +17,36 @@ Fylm: FILM: https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&exp
 #include <time.h>
 #include <wait.h>
 
+// fungsi untuk mendowload foto, musik, dan video
 void download(char *link, char *name) {
     pid_t child_id;
     child_id = fork();
 
     if (child_id == 0) {
         char *argv[6] = {
-            "wget",
-            "--no-check-certificate",
-            "-q",
-            link,
+            "wget", //menggunakan wget untuk mengunduh file berbanyak
+            "--no-check-certificate", 
+            link, //menuju ke link yang akan didownload
             "-O",
             name
         };
         
-        execv("/bin/wget", argv);
+        execv("/bin/wget", argv); //mengeksekusi dengan mendowloadnya
         exit(EXIT_SUCCESS);
     } else if (child_id > 0) {
-        wait(NULL);
+        wait(NULL); //parentnya nunggu
     }
 }
 
+
+//untuk mengunzip file yang sudah didownload
 void unzip(char *name) {
     pid_t child_id;
     child_id = fork();
 
     if (child_id == 0) {
         char *argv[3] = {
-            "unzip",
+            "unzip", //menggunakan perintah unzip untuk mengekstrak zip yng sudah dibuat
             "-q",
             name
         };
@@ -52,17 +54,18 @@ void unzip(char *name) {
         execv("/usr/bin/unzip", argv);
         exit(EXIT_SUCCESS);
     } else if (child_id > 0) {
-        wait(NULL);
+        wait(NULL); //parentnya menunggu
     }
 }
 
+//mengcopy dalam folder yang diinginkan
 void copy(char *name, char *target) {
     pid_t child_id;
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[4] = {
-            "cp",
+        char *argv[4] = { 
+            "cp", //mengcopy 
             "-R",
             name,
             target
@@ -75,6 +78,7 @@ void copy(char *name, char *target) {
     }
 }
 
+//menzipkan semua folder yang sudah dibuat
 void zip() {
     pid_t child_id;
     child_id = fork();
@@ -97,6 +101,7 @@ void zip() {
     }
 }
 
+//fungsi mendelete semua folder dan menyisakan zip
 void delete() {
     pid_t child_id;
     child_id = fork();
