@@ -45,7 +45,7 @@ Film: https://drive.google.com/file/d/1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp/view </b
 
 - Gunakan fungsi wait() dan sleep() untuk memperlancarrr..
 - untuk mendownload zip yang dibutuhkan bisa menggunakan command :
-> Pwget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
+> wget --no-check-certificate "https://drive.google.com/uc?id=ID-FILE&export=download" -O Nama_untuk_filenya.ext
 
 > Contoh: Wget --no-check-certificate "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download" -O Musik_for_Stevany.zip
 
