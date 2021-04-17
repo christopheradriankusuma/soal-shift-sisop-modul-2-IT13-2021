@@ -79,7 +79,7 @@ void download(char *link, char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[6] = {
+        char *argv[7] = {
             "wget", //menggunakan wget untuk mengunduh file berbanyak
             "--no-check-certificate", 
             "-q",
@@ -102,7 +102,7 @@ void unzip(char *name) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[3] = {
+        char *argv[4] = {
             "unzip", //menggunakan perintah unzip untuk mengekstrak zip yng sudah dibuat
             "-q",
             name
@@ -121,7 +121,7 @@ void copy(char *name, char *target) {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[4] = { 
+        char *argv[5] = { 
             "cp", //mengcopy 
             "-R",
             name,
@@ -141,7 +141,7 @@ void zip() {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[7] = {
+        char *argv[8] = {
             "zip", 
             "-q",
             "-r", 
@@ -164,7 +164,7 @@ void delete() {
     child_id = fork();
 
     if (child_id == 0) {
-        char *argv[8] = {
+        char *argv[9] = {
             "rm",
             "-rf",
             "FOTO",
@@ -206,9 +206,9 @@ int main() {
 		exit(EXIT_FAILURE);
 	}
 
-    // close(STDIN_FILENO);
-	// close(STDOUT_FILENO);
-	// close(STDERR_FILENO);
+    close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
     char *link[3] = {
         "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download",
@@ -352,15 +352,15 @@ void zip() {
 ```
 
 ## Kendala yang Dihadapi: 
-tidak ada.
+Awalnya ketika ada baris `close(STDIN_FILENO)` dan 2 baris lainnya, program tidak bisa mendownload dengan benar, muncul file zip tetapi tidak ada isinya. Setelah mencoba memperbesar ukuran setiap `*argv[]` dan mencoba 3 baris `close` lagi, akhirnya program berjalan dengan benar.
 
 ## Screeshoot Hasil:
 
 1. Mendownload file yang diinginkan kemudian meng-extract-nya setelah didownload. Setelah itu memindahkannya ke dalam folder yang telah dibuat kemudian menjadikannya dalam bentuk zip kemudian merename masing2 folder tersebut dengan nama (film/foto/musik)_for_Stevany
-![gambar11](soal1.png)
+![gambar11](Screenshots/soal1.png)
 
 2. Kemudian semua folder di zip dengan nama Lopyu_Stevany.zip dan semua folder akan di delete(sehingga hanya menyisakan .zip)
-![gambar21](soal1a.png)
+![gambar21](Screenshots/soal1a.png)
 
 
 ---
@@ -792,11 +792,11 @@ void write_keterangan(char *dir, char *pet_name, char *pet_age) {
 
 
 ## Kendala yang Dihadapi: 
-tidak ada kendala
+Awalnya program tidak bisa melakukan delete directory. Setelah mencoba memperbesar ukuran array `*argv[]` akhirnya bisa berjalan dengan baik.
 
 ## Screeshoot Hasil:
 1. Function process yang melakukan filterisasi dan pembuatan directory sesuai dengan jenis hewan dari setiap foto.
-![gambar](soal2hasil.png)
+![gambar](Screenshots/soal2hasil.png)
 
 
 ---
@@ -1309,18 +1309,18 @@ void delete_dir(char *name) {
 }
 ```
 ## Kendala yang Dihadapi: 
-Saat mendownload gambar durasinya tidak tepat 5 detik namun bisa sampai 6-7 detik.
+Saat mendownload gambar durasinya tidak tepat 5 detik namun bisa sampai 6-7 detik. Kami juga mencoba mendownload tepat setiap 5 detik tetapi proses zip terkadang tidak berjalan dengan benar. Ketika digabungkan dengan membuat folder tepat setiap 40 detik (bersamaan dengan proses download gambar) hasil zip sangat tidak benar (ada yang tidak ada isinya, ada yang hanya terisi sebagian). Akhirnya kami menggunakan solusi awal, yaitu mendownload tidak tepat 5 detik, dan membuat folder 40 detik setelah proses download selesai.
 
 ## Screeshoot Hasil:
 1. Metode -z dimana metode ini mendownload semua file dan kemudian menjadikan file yang ada di folder tersebut dalam bentuk zip.
-![gambar](soal3z1.png)
+![gambar](Screenshots/soal3z1.png)
 Ketika killer.sh nya dijalankan dia akan langsung berhenti.
-![gambar](soal3z.png)
+![gambar](Screenshots/soal3z.png)
 
 2. Metode -x dimana metode ini mendownload semua file dan kemudian menjadikan file yang ada di folder tersebut dalam bentuk zip.
-![gambar](soalx1.png)
+![gambar](Screenshots/soalx1.png)
 Namun ketika killer.sh dijalankan program akan menunggu dahulu hingga proses selesai kemudian berhenti
-![gambar](soal3x2.png)
+![gambar](Screenshots/soal3x2.png)
 
 
 ---
